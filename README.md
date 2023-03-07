@@ -12,11 +12,11 @@ Api de controle de contas e credenciais
     - alterar
     - [mostrar detalhes](#detalhes-da-credencial)
 - Cartão
-    - cadastrar
+    - [cadastrar](#cadastrar-cartão)
     - apagar
     - listar todas
     - alterar
-    - mostrar detalhes  
+    - [mostrar detalhes](#detalhes-do-cartão)  
 - Contas
     - [cadastrar](#cadastrar-conta)
     - apagar
@@ -87,7 +87,74 @@ Api de controle de contas e credenciais
 | 200 | dados da credencial retornados
 | 404 | não existe credencial com o id informado
 
+---
+
+### Cadastrar Cartão
+
+`POST` /ultimatepassowrd/api/cartao
+
+**Campos da Requisição**
+
+| campo | tipo | obrigatório | descrição 
+|-------|------|:-------------:|---
+| cartao_id | int | sim | id deste cartao
+| nome_cartao | texto | sim | nome do cartao, serve como um nome descritivo sobre o que significa este cartao
+| titular_cartao | texto | sim |o titular do cartao
+| bandeira | texto | sim | a bandeira do cartao
+| mes_vencimento | int | sim | o mes de vencimento do cartao
+| ano_vencimento | int | sim | o ano de vencimento do cartao
+| numero | int | sim | o numero do cartao
+
+**Exemplo de corpo de requisição**
+
+```js
+{
+    cartao_id: 1,
+    nome_cartao: "Cartão da minha mãe",
+    titular_cartao: "ANA DOS SANTOS SILVA",
+    bandeira: "MasterCard",
+    mes_vencimento: '02',
+    ano_vencimento:'2028',
+    numero: '1234567891011121'
+}
+```
+
+**Códigos de Respostas**
+
+| código | descrição
+|-|-
+| 201 | cartao cadastrado com sucesso
+| 400 | campos inválidos
+
 ----
+
+### Detalhes do Cartão
+
+`GET` /ultimatepassword/api/cartao{id}
+
+**Exemplo de corpo de resposta**
+
+```js
+{
+    
+    cartao_id: '1',
+    nome_cartao: "Cartão da minha mãe",
+    titular_cartao: "ANA DOS SANTOS SILVA",
+    bandeira: "MasterCard",
+    mes_vencimento: '02',
+    ano_vencimento:'2028',
+    numero: '1234567891011121'
+}
+```
+
+**Códigos de Respostas**
+
+| código | descrição
+|-|-
+| 200 | dados do cartao retornados
+| 404 | não existe cartao com o id informado
+
+---
 
 ### Cadastrar conta
 
