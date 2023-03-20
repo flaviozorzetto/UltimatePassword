@@ -1,6 +1,6 @@
 package br.com.fiap.ultimatepassword.models;
 public class Cartao {
-    private int cartao_id;
+    private Long cartao_id;
     private String nome_cartao;
     private String titular_cartao;
     private String bandeira;
@@ -8,7 +8,7 @@ public class Cartao {
     private int ano_vencimento;
     private int numero;
 
-    public Cartao(int cartao_id, String nome_cartao, String titular_cartao, String bandeira, int mes_vencimento,
+    public Cartao(Long cartao_id, String nome_cartao, String titular_cartao, String bandeira, int mes_vencimento,
             int ano_vencimento, int numero) {
         this.cartao_id = cartao_id;
         this.nome_cartao = nome_cartao;
@@ -26,10 +26,10 @@ public class Cartao {
                 + ", numero=" + numero + "]";
     }
 
-    public int getCartao_id() {
+    public Long getCartao_id() {
         return cartao_id;
     }
-    public void setCartao_id(int cartao_id) {
+    public void setCartao_id(Long cartao_id) {
         this.cartao_id = cartao_id;
     }
     public String getNome_cartao() {
