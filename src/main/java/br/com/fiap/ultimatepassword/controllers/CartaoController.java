@@ -1,9 +1,11 @@
 package br.com.fiap.ultimatepassword.controllers;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,75 +17,69 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import br.com.fiap.ultimatepassword.models.Cartao;
+import br.com.fiap.ultimatepassword.repository.CartaoRepository;
 
 @RestController
 @RequestMapping("ultimatepassword/cartao")
 public class CartaoController {
-		ArrayList<Cartao> cartoes = new ArrayList<>();
+		
+		List<Cartao> cartoes = new ArrayList<>();
+		
 		Logger log = LoggerFactory.getLogger(CartaoController.class);
 
+		@Autowired
+		CartaoRepository repository;
+
     @GetMapping
-    public ArrayList<Cartao> index(){
-			log.info("Consultando cartões");
-      return cartoes;
+    public List<Cartao> index(){
+      return repository.findAll();
     }
 
 		@PostMapping
 		public ResponseEntity<Cartao> create(@RequestBody Cartao cartao) {
 			log.info("Cadastrando cartao " + cartao);
-			cartoes.add(cartao);
+
+			repository.save(cartao);
+
 			return ResponseEntity.status(HttpStatus.CREATED).body(cartao);
 		}
 
 		@GetMapping("{id}")
 		public ResponseEntity<Cartao> show(@PathVariable Long id) {
 			log.info("detalhando cartão " + id);
-			Cartao cartaoEncontrado = null;
+			var cartaoEncontrado = repository.findById(id);
 
-			for(Cartao cartao: cartoes) {
-				if(cartao.getCartao_id() == id) {
-					cartaoEncontrado = cartao;
-				}
-			}
-
-			if(cartaoEncontrado == null) {
+			if(cartaoEncontrado.isEmpty())
 				return ResponseEntity.notFound().build();
-			}
 
-			return ResponseEntity.ok(cartaoEncontrado);
+			return ResponseEntity.ok(cartaoEncontrado.get());
 		}
 
 		@DeleteMapping("{id}")
     public ResponseEntity<Cartao> destroy(@PathVariable Long id){
         log.info("apagando cartão " + id);
 
-        for(int i = 0; i < cartoes.size(); i++) {
-					if(cartoes.get(i).getCartao_id() == id) {
-						cartoes.remove(i);
-						return ResponseEntity.noContent().build();
-					}
-				}
+        var cartaoEncontrado = repository.findById(id);
+
+				if(cartaoEncontrado.isEmpty())
+					return ResponseEntity.notFound().build();
+
+				repository.deleteById(id);
 				
-				return ResponseEntity.notFound().build();
+				return ResponseEntity.noContent().build();
     }
 
 		@PutMapping("{id}")
 		public ResponseEntity<Cartao> update(@PathVariable Long id, @RequestBody Cartao cartao) {
 			log.info("atualizando cartão " + id);
-			boolean cartaoEncontrado = false;
+			var cartaoEncontrado = repository.findById(id);
 
-			for(int i = 0; i < cartoes.size(); i++) {
-				if(cartoes.get(i).getCartao_id() == id) {
-					cartoes.remove(i);
-					cartoes.add(cartao);
-					cartaoEncontrado = true;
-				}
-			}
+			if(cartaoEncontrado.isEmpty())
+					return ResponseEntity.notFound().build();
 
-			if(cartaoEncontrado == false) {
-				return ResponseEntity.notFound().build();
-			}
-
+			cartao.setCartao_id(id);
+			repository.save(cartao);
+			
 			return ResponseEntity.ok(cartao);
 		}
     

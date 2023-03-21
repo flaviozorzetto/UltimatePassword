@@ -1,5 +1,14 @@
 package br.com.fiap.ultimatepassword.models;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
 public class Cartao {
+		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartao_id;
     private String nome_cartao;
     private String titular_cartao;
@@ -8,8 +17,10 @@ public class Cartao {
     private int ano_vencimento;
     private int numero;
 
+		protected Cartao(){}
+
     public Cartao(Long cartao_id, String nome_cartao, String titular_cartao, String bandeira, int mes_vencimento,
-            int ano_vencimento, int numero) {
+        int ano_vencimento, int numero) {
         this.cartao_id = cartao_id;
         this.nome_cartao = nome_cartao;
         this.titular_cartao = titular_cartao;
