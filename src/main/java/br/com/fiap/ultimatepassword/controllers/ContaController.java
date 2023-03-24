@@ -1,9 +1,10 @@
 package br.com.fiap.ultimatepassword.controllers;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,75 +17,66 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fiap.ultimatepassword.models.Conta;
+import br.com.fiap.ultimatepassword.repository.ContaRepository;
 
 @RestController
 @RequestMapping("ultimatepassword/conta")
 public class ContaController {
-		Logger log = LoggerFactory.getLogger(ContaController.class);
-		ArrayList<Conta> contas = new ArrayList<>();
+	Logger log = LoggerFactory.getLogger(ContaController.class);
 
-    @GetMapping
-    public ArrayList<Conta> index(){
-			log.info("Consultando contas");
-			return contas;
-    }
+	@Autowired
+	ContaRepository repository;
 
-		@PostMapping
-		public ResponseEntity<Conta> create(@RequestBody Conta conta) {
-			log.info("Cadastrando conta " + conta);
-			contas.add(conta);
-			return ResponseEntity.status(HttpStatus.CREATED).body(conta);
-		}
+	@GetMapping
+	public List<Conta> index() {
+		return repository.findAll();
+	}
 
-		@GetMapping("{id}")
-		public ResponseEntity<Conta> show(@PathVariable Long id) {
-			log.info("Detalhando conta " + id);
-			Conta contaEncontrada = null;
+	@PostMapping
+	public ResponseEntity<Conta> create(@RequestBody Conta conta) {
+		log.info("Cadastrando conta " + conta);
 
-			for(Conta conta: contas) {
-				if(conta.getConta_id() == id) {
-					contaEncontrada = conta;
-				}
-			}
+		repository.save(conta);
 
-			if(contaEncontrada == null) {
-				return ResponseEntity.notFound().build();
-			}
+		return ResponseEntity.status(HttpStatus.CREATED).body(conta);
+	}
 
-			return ResponseEntity.ok(contaEncontrada);
-		}
+	@GetMapping("{id}")
+	public ResponseEntity<Conta> show(@PathVariable Long id) {
+		log.info("Detalhando conta " + id);
+		var contaEncontrada = repository.findById(id);
 
-		@DeleteMapping("{id}")
-    public ResponseEntity<Conta> destroy(@PathVariable Long id){
-        log.info("apagando conta " + id);
+		if (contaEncontrada.isEmpty())
+			return ResponseEntity.notFound().build();
 
-        for(int i = 0; i < contas.size(); i++) {
-					if(contas.get(i).getConta_id() == id) {
-						contas.remove(i);
-						return ResponseEntity.noContent().build();
-					}
-				}
-				
-				return ResponseEntity.notFound().build();
-    }
+		return ResponseEntity.ok(contaEncontrada.get());
+	}
 
-		@PutMapping("{id}")
-		public ResponseEntity<Conta> update(@PathVariable Long id, @RequestBody Conta conta) {
-			log.info("atualizando conta " + id);
-			boolean contaEncontrada = false;
+	@DeleteMapping("{id}")
+	public ResponseEntity<Conta> destroy(@PathVariable Long id) {
+		log.info("apagando conta " + id);
 
-			for(int i = 0; i < contas.size(); i++) {
-				if(contas.get(i).getConta_id() == id) {
-					contas.remove(i);
-					contas.add(conta);
-					contaEncontrada = true;
-				}
-			}
+		var contaEncontrada = repository.findById(id);
 
-			if(contaEncontrada == false) {
-				return ResponseEntity.notFound().build();
-			}
+		if (contaEncontrada.isEmpty())
+			return ResponseEntity.notFound().build();
 
-			return ResponseEntity.ok(conta);
-		}
+		repository.deleteById(id);
+
+		return ResponseEntity.noContent().build();
+	}
+
+	@PutMapping("{id}")
+	public ResponseEntity<Conta> update(@PathVariable Long id, @RequestBody Conta conta) {
+		log.info("atualizando conta " + id);
+		var contaEncontrada = repository.findById(id);
+
+		if (contaEncontrada.isEmpty())
+			return ResponseEntity.notFound().build();
+
+		conta.setConta_id(id);
+		repository.save(conta);
+
+		return ResponseEntity.ok(conta);
+	}
 }

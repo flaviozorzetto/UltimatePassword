@@ -1,13 +1,24 @@
 package br.com.fiap.ultimatepassword.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
 public class Credencial {
-		private int credencial_id;
+		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
+		private Long credencial_id;
 		private String nome_credencial;
 		private String nome_usuario;
 		private String senha;
 		private String url;
 		private String notas;
-		public Credencial(int credencial_id, String nome_credencial, String nome_usuario, String senha, String url, String notas) {
+
+		protected Credencial () {}
+
+		public Credencial(Long credencial_id, String nome_credencial, String nome_usuario, String senha, String url, String notas) {
 			this.credencial_id = credencial_id;
 			this.nome_credencial = nome_credencial;
 			this.nome_usuario = nome_usuario;
@@ -15,10 +26,10 @@ public class Credencial {
 			this.url = url;
 			this.notas = notas;
 		}
-		public int getCredencial_id() {
+		public Long getCredencial_id() {
 			return credencial_id;
 		}
-		public void setCredencial_id(int credencial_id) {
+		public void setCredencial_id(Long credencial_id) {
 			this.credencial_id = credencial_id;
 		}
 		public String getNome_credencial() {
