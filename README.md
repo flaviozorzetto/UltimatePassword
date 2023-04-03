@@ -104,6 +104,7 @@ Api de controle de contas e credenciais
 | mes_vencimento | int | sim | o mes de vencimento do cartao
 | ano_vencimento | int | sim | o ano de vencimento do cartao
 | numero | int | sim | o numero do cartao
+| cvv | int | sim | o cvv deste cartão
 
 **Exemplo de corpo de requisição**
 
@@ -115,7 +116,8 @@ Api de controle de contas e credenciais
     bandeira: "MasterCard",
     mes_vencimento: '02',
     ano_vencimento:'2028',
-    numero: '1234567891011121'
+    numero: '1234567891011121',
+    cvv: '001'
 }
 ```
 
@@ -143,7 +145,8 @@ Api de controle de contas e credenciais
     bandeira: "MasterCard",
     mes_vencimento: '02',
     ano_vencimento:'2028',
-    numero: '1234567891011121'
+    numero: '1234567891011121',
+    cvv: '001'
 }
 ```
 
