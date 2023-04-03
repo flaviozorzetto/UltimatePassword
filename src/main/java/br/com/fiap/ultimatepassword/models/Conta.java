@@ -4,16 +4,20 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Conta {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long conta_id;
+	@NotNull
 	private String usuario;
+	@NotNull
 	private String senha;
 
-	protected Conta() {}
+	protected Conta() {
+	}
 
 	public Conta(Long conta_id, String usuario, String senha) {
 		this.conta_id = conta_id;

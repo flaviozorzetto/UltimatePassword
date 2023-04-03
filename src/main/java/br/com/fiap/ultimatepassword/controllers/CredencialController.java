@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fiap.ultimatepassword.exceptions.RestNotFoundException;
 import br.com.fiap.ultimatepassword.models.Credencial;
 import br.com.fiap.ultimatepassword.repository.CredencialRepository;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("ultimatepassword/credencial")
@@ -33,7 +35,7 @@ public class CredencialController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Credencial> create(@RequestBody Credencial credencial) {
+	public ResponseEntity<Credencial> create(@RequestBody @Valid Credencial credencial) {
 		log.info("Cadastrando credencial " + credencial);
 
 		repository.save(credencial);
@@ -44,40 +46,36 @@ public class CredencialController {
 	@GetMapping("{id}")
 	public ResponseEntity<Credencial> show(@PathVariable Long id) {
 		log.info("Detalhando credencial " + id);
-		var credencialEncontrado = repository.findById(id);
 
-		if (credencialEncontrado.isEmpty())
-			return ResponseEntity.notFound().build();
+		var credencial = getCredencial(id);
 
-		return ResponseEntity.ok(credencialEncontrado.get());
+		return ResponseEntity.ok(credencial);
 	}
 
 	@DeleteMapping("{id}")
 	public ResponseEntity<Credencial> destroy(@PathVariable Long id) {
 		log.info("apagando credencial " + id);
 
-		var credencialEncontrado = repository.findById(id);
+		var cartao = getCredencial(id);
 
-		if (credencialEncontrado.isEmpty())
-			return ResponseEntity.notFound().build();
-
-		repository.deleteById(id);
+		repository.delete(cartao);
 
 		return ResponseEntity.noContent().build();
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<Credencial> update(@PathVariable Long id, @RequestBody Credencial credencial) {
+	public ResponseEntity<Credencial> update(@PathVariable Long id, @Valid @RequestBody Credencial credencial) {
 		log.info("atualizando credencial " + id);
-		var credencialEncontrado = repository.findById(id);
-
-		if (credencialEncontrado.isEmpty())
-			return ResponseEntity.notFound().build();
+		getCredencial(id);
 
 		credencial.setCredencial_id(id);
 		repository.save(credencial);
 
 		return ResponseEntity.ok(credencial);
+	}
+
+	private Credencial getCredencial(Long id) {
+		return repository.findById(id).orElseThrow(() -> new RestNotFoundException("Não foi encontrado uma credencial"));
 	}
 
 }

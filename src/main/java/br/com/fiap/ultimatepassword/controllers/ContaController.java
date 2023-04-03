@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fiap.ultimatepassword.exceptions.RestNotFoundException;
 import br.com.fiap.ultimatepassword.models.Conta;
 import br.com.fiap.ultimatepassword.repository.ContaRepository;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("ultimatepassword/conta")
@@ -33,7 +35,7 @@ public class ContaController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Conta> create(@RequestBody Conta conta) {
+	public ResponseEntity<Conta> create(@RequestBody @Valid Conta conta) {
 		log.info("Cadastrando conta " + conta);
 
 		repository.save(conta);
@@ -44,39 +46,35 @@ public class ContaController {
 	@GetMapping("{id}")
 	public ResponseEntity<Conta> show(@PathVariable Long id) {
 		log.info("Detalhando conta " + id);
-		var contaEncontrada = repository.findById(id);
+		var conta = getConta(id);
 
-		if (contaEncontrada.isEmpty())
-			return ResponseEntity.notFound().build();
-
-		return ResponseEntity.ok(contaEncontrada.get());
+		return ResponseEntity.ok(conta);
 	}
 
 	@DeleteMapping("{id}")
 	public ResponseEntity<Conta> destroy(@PathVariable Long id) {
 		log.info("apagando conta " + id);
 
-		var contaEncontrada = repository.findById(id);
+		var conta = getConta(id);
 
-		if (contaEncontrada.isEmpty())
-			return ResponseEntity.notFound().build();
-
-		repository.deleteById(id);
+		repository.delete(conta);
 
 		return ResponseEntity.noContent().build();
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<Conta> update(@PathVariable Long id, @RequestBody Conta conta) {
+	public ResponseEntity<Conta> update(@PathVariable Long id, @Valid @RequestBody Conta conta) {
 		log.info("atualizando conta " + id);
-		var contaEncontrada = repository.findById(id);
-
-		if (contaEncontrada.isEmpty())
-			return ResponseEntity.notFound().build();
+		getConta(id);
 
 		conta.setConta_id(id);
 		repository.save(conta);
 
 		return ResponseEntity.ok(conta);
 	}
+
+	private Conta getConta(Long id) {
+		return repository.findById(id).orElseThrow(() -> new RestNotFoundException("Conta não encontrada"));
+	}
+
 }

@@ -15,13 +15,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import br.com.fiap.ultimatepassword.exceptions.RestNotFoundException;
 import br.com.fiap.ultimatepassword.models.Cartao;
 import br.com.fiap.ultimatepassword.repository.CartaoRepository;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("ultimatepassword/cartao")
 public class CartaoController {
-
 	Logger log = LoggerFactory.getLogger(CartaoController.class);
 
 	@Autowired
@@ -33,7 +35,7 @@ public class CartaoController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Cartao> create(@RequestBody Cartao cartao) {
+	public ResponseEntity<Cartao> create(@RequestBody @Valid Cartao cartao) {
 		log.info("Cadastrando cartao " + cartao);
 
 		repository.save(cartao);
@@ -44,40 +46,36 @@ public class CartaoController {
 	@GetMapping("{id}")
 	public ResponseEntity<Cartao> show(@PathVariable Long id) {
 		log.info("detalhando cartão " + id);
-		var cartaoEncontrado = repository.findById(id);
 
-		if (cartaoEncontrado.isEmpty())
-			return ResponseEntity.notFound().build();
+		var cartao = getCartao(id);
 
-		return ResponseEntity.ok(cartaoEncontrado.get());
+		return ResponseEntity.ok(cartao);
 	}
 
 	@DeleteMapping("{id}")
 	public ResponseEntity<Cartao> destroy(@PathVariable Long id) {
 		log.info("apagando cartão " + id);
 
-		var cartaoEncontrado = repository.findById(id);
+		var cartao = getCartao(id);
 
-		if (cartaoEncontrado.isEmpty())
-			return ResponseEntity.notFound().build();
-
-		repository.deleteById(id);
+		repository.delete(cartao);
 
 		return ResponseEntity.noContent().build();
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<Cartao> update(@PathVariable Long id, @RequestBody Cartao cartao) {
+	public ResponseEntity<Cartao> update(@PathVariable Long id, @Valid @RequestBody Cartao cartao) {
 		log.info("atualizando cartão " + id);
-		var cartaoEncontrado = repository.findById(id);
-
-		if (cartaoEncontrado.isEmpty())
-			return ResponseEntity.notFound().build();
+		getCartao(id);
 
 		cartao.setCartao_id(id);
 		repository.save(cartao);
 
 		return ResponseEntity.ok(cartao);
+	}
+
+	private Cartao getCartao(Long id) {
+		return repository.findById(id).orElseThrow(() -> new RestNotFoundException("Cartão nao encontrado"));
 	}
 
 }
