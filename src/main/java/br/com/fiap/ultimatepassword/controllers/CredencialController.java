@@ -68,7 +68,7 @@ public class CredencialController {
 		log.info("atualizando credencial " + id);
 		getCredencial(id);
 
-		credencial.setCredencial_id(id);
+		credencial.setId(id);
 		repository.save(credencial);
 
 		return ResponseEntity.ok(credencial);

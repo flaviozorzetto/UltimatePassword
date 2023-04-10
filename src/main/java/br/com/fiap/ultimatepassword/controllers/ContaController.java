@@ -24,7 +24,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("ultimatepassword/conta")
 public class ContaController {
-	Logger log = LoggerFactory.getLogger(ContaController.class);
+	Logger log = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	ContaRepository repository;
@@ -67,7 +67,7 @@ public class ContaController {
 		log.info("atualizando conta " + id);
 		getConta(id);
 
-		conta.setConta_id(id);
+		conta.setId(id);
 		repository.save(conta);
 
 		return ResponseEntity.ok(conta);

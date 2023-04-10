@@ -68,7 +68,7 @@ public class CartaoController {
 		log.info("atualizando cartão " + id);
 		getCartao(id);
 
-		cartao.setCartao_id(id);
+		cartao.setId(id);
 		repository.save(cartao);
 
 		return ResponseEntity.ok(cartao);
