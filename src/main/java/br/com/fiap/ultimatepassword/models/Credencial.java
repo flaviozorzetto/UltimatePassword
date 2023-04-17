@@ -11,6 +11,8 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @Entity
+@Builder
+@AllArgsConstructor
 public class Credencial {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

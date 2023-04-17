@@ -5,6 +5,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fiap.ultimatepassword.exceptions.RestNotFoundException;
@@ -30,8 +34,13 @@ public class CredencialController {
 	CredencialRepository repository;
 
 	@GetMapping
-	public List<Credencial> index() {
-		return repository.findAll();
+	public Page<Credencial> index(@RequestParam(required = false) String url,
+			@PageableDefault(size = 5) Pageable pageable) {
+
+		if (url == null) {
+			return repository.findAll(pageable);
+		}
+		return repository.findByUrlContaining(url, pageable);
 	}
 
 	@PostMapping
