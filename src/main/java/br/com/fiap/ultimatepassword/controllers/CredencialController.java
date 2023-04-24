@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,38 +36,38 @@ public class CredencialController {
 	@Autowired
 	CredencialRepository repository;
 
+	@Autowired
+	PagedResourcesAssembler<Object> assembler;
+
 	@GetMapping
-	public Page<Credencial> index(@RequestParam(required = false) String url,
+	public PagedModel<EntityModel<Object>> index(@RequestParam(required = false) String url,
 			@PageableDefault(size = 5) Pageable pageable) {
 
-		if (url == null) {
-			return repository.findAll(pageable);
-		}
-		return repository.findByUrlContaining(url, pageable);
+		Page<Credencial> credenciais = (url == null) ? repository.findAll(pageable)
+				: repository.findByUrlContaining(url, pageable);
+
+		return assembler.toModel(credenciais.map(Credencial::toEntityModel));
 	}
 
 	@PostMapping
-	public ResponseEntity<Credencial> create(@RequestBody @Valid Credencial credencial) {
+	public ResponseEntity<Object> create(@RequestBody @Valid Credencial credencial) {
 		log.info("Cadastrando credencial " + credencial);
 
 		repository.save(credencial);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(credencial);
+		return ResponseEntity
+				.created(credencial.toEntityModel().getRequiredLink("self").toUri()).body(credencial.toEntityModel());
 	}
 
 	@GetMapping("{id}")
-	public ResponseEntity<Credencial> show(@PathVariable Long id) {
+	public EntityModel<Credencial> show(@PathVariable Long id) {
 		log.info("Detalhando credencial " + id);
-
-		var credencial = getCredencial(id);
-
-		return ResponseEntity.ok(credencial);
+		return getCredencial(id).toEntityModel();
 	}
 
 	@DeleteMapping("{id}")
 	public ResponseEntity<Credencial> destroy(@PathVariable Long id) {
 		log.info("apagando credencial " + id);
-
 		var cartao = getCredencial(id);
 
 		repository.delete(cartao);
@@ -73,14 +76,14 @@ public class CredencialController {
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<Credencial> update(@PathVariable Long id, @Valid @RequestBody Credencial credencial) {
+	public EntityModel<Credencial> update(@PathVariable Long id, @Valid @RequestBody Credencial credencial) {
 		log.info("atualizando credencial " + id);
 		getCredencial(id);
 
 		credencial.setId(id);
 		repository.save(credencial);
 
-		return ResponseEntity.ok(credencial);
+		return credencial.toEntityModel();
 	}
 
 	private Credencial getCredencial(Long id) {
