@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.fiap.ultimatepassword.models.securityModels.SCredencial;
 import br.com.fiap.ultimatepassword.models.securityModels.SUsuario;
 import br.com.fiap.ultimatepassword.repository.SUsuarioRepository;
+import br.com.fiap.ultimatepassword.service.TokenService;
 import jakarta.validation.Valid;
 
 @RestController
@@ -26,6 +27,9 @@ public class SUsuarioController {
 	@Autowired
 	PasswordEncoder encoder;
 
+	@Autowired
+	TokenService tokenService;
+
 	@PostMapping("/ultimatepassword/registrar")
 	public ResponseEntity<SUsuario> registrar(@RequestBody @Valid SUsuario susuario) {
 		susuario.setSenha(encoder.encode(susuario.getSenha()));
@@ -36,7 +40,9 @@ public class SUsuarioController {
 	@PostMapping("/ultimatepassword/login")
 	public ResponseEntity<Object> login(@RequestBody @Valid SCredencial scredencial) {
 		manager.authenticate(scredencial.toAuthentication());
-		return ResponseEntity.ok().build();
+
+		var token = tokenService.generateToken(scredencial);
+		return ResponseEntity.ok(token);
 	}
 
 }
